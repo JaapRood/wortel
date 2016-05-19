@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# delete symlinks
+rm -f node_modules/app
+
+# create symlinks
+ln -s ../src node_modules/app
+
+# perform any building steps
+gulp compile
