@@ -4,8 +4,8 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 const App = require('app');
-
 const AppComponent = require('app/components/app')
+const BaseStyles = require('app/styles/base.less')
 
 const app = App();
 
