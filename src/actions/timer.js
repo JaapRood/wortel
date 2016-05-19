@@ -9,14 +9,18 @@ const internals = {}
 internals.timer = null
 internals.timerId = null
 
-exports.start = () => (dispatch, getState) => {
-	const length = T(5).seconds().valueOf()
-
+internals.resetTimer = () => {
 	if (internals.timer) {
 		clearTimeout(internals.timer)
 		internals.timer = null
 		internals.timerId = null
 	}
+}
+
+exports.start = () => (dispatch, getState) => {
+	const length = T(5).seconds().valueOf()
+
+	internals.resetTimer()
 
 	dispatch(CreateAction(TimerReducer.START, { length: length }))
 
@@ -32,6 +36,8 @@ exports.start = () => (dispatch, getState) => {
 	}, length - (Date.now() - createdTimer.get('startedAt')))
 }
 
-exports.stop = () => {
-	return CreateAction(TimerReducer.STOP, { time: Date.now() })
+exports.stop = () => (dispatch, getState) => {
+	internals.resetTimer()
+
+	dispatch(CreateAction(TimerReducer.STOP, { time: Date.now() }))
 }
