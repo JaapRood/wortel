@@ -1,5 +1,7 @@
-module.exports = function(state, action) {
-	if (!state) state = {}
+const ReduxImmutable = require('redux-immutable')
 
-	return state
-}
+const combinedReducers = ReduxImmutable.combineReducers({
+	timer: require('./timer').reduce
+})
+
+module.exports = combinedReducers;
