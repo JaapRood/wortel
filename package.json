@@ -24,6 +24,7 @@
     "redux-actions": "^0.9.1",
     "redux-immutable": "^3.0.6",
     "redux-logger": "^2.6.1",
+    "redux-thunk": "^2.1.0",
     "time-sugar": "^3.0.0"
   },
   "devDependencies": {

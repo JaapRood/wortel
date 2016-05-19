@@ -2,6 +2,7 @@ const Redux = require('redux')
 const React = require('react')
 const ReactRedux = require('react-redux')
 const ReduxLogger = require('redux-logger')
+const ReduxThunk = require('redux-thunk')
 const Immutable = require('immutable');
 const _ = require('lodash')
 
@@ -9,7 +10,9 @@ const AppReducer = require('./reducers/app')
 
 const internals = {}
 
-internals.middlewares = []
+internals.middlewares = [
+	ReduxThunk.default
+]
 
 if (process.env.NODE_ENV !== "production") {
 	internals.middlewares.push(ReduxLogger({
