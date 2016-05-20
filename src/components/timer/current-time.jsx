@@ -7,28 +7,36 @@ internals.getElapsedSeconds = (startTime) => {
 	return Math.floor((Date.now() - startTime) / 1000)
 }
 
+internals.getSecondsLeft = (endTime) => {
+	return Math.ceil((endTime - Date.now()) / 1000)
+}
+
 module.exports = React.createClass({
 	getDefaultProps() {
 		return {
-			startedAt: null
+			startedAt: null,
+			endsAt: null
 		}
 	},
 
 	getInitialState() {
 		return {
-			elapsedSeconds: internals.getElapsedSeconds(this.props.startedAt)
+			seconds: internals.getElapsedSeconds(this.props.startedAt)
 		}
 	},
 
 	render() {
 		const { 
-			elapsedSeconds
+			seconds
 		} = this.state
 
 		return (
-			<h3>{elapsedSeconds} seconds</h3>
+			<h3>{seconds} seconds</h3>
 		)
 	},
+
+	// Lifecycle
+	// ---------
 
 	componentDidMount() {
 		this.raf = Raf(this.tick)
@@ -44,20 +52,33 @@ module.exports = React.createClass({
 	tick() {
 		if (!this.isMounted()) return
 
-		this.updateElapsed(() => {
+		this.updateTime(() => {
 			this.raf = Raf(this.tick)
 		})
 	},
 
-	updateElapsed(callback) {
-		const elapsedSeconds = internals.getElapsedSeconds(this.props.startedAt)
+	// State control
+	// -------------
 
-		if (elapsedSeconds !== this.state.elapsedSeconds) {
-			this.setState({
-				elapsedSeconds: elapsedSeconds
-			}, callback)
-		} else {
-			callback()
+	updateTime(callback) {
+		if (this.props.startedAt) {
+			let elapsedSeconds = internals.getElapsedSeconds(this.props.startedAt)
+			
+			if (elapsedSeconds !== this.state.seconds) {
+				return this.setState({
+					seconds: elapsedSeconds
+				}, callback)
+			}
+		} else if (this.props.endsAt) {
+			let secondsLeft = internals.getSecondsLeft(this.props.endsAt)
+
+			if (secondsLeft !== this.state.seconds) {
+				return this.setState({
+					seconds: secondsLeft
+				}, callback)
+			}
 		}
+
+		callback()
 	}
 })

@@ -36,7 +36,7 @@ internals.component = (props) => {
 				<div>
 					Running for {Math.round(length / 1000)} seconds, Started at: {startedAt}
 
-					<CurrentTime startedAt={startedAt} />
+					<CurrentTime endsAt={startedAt + length} />
 				</div>
 			)}
 
