@@ -1,5 +1,6 @@
 const { handleActions } = require('redux-actions')
 const Immutable = require('immutable')
+const ShortId = require('shortid')
 
 exports.START = 'TIMER_START'
 exports.STOP = 'TIMER_STOP'
@@ -8,6 +9,7 @@ const internals = {}
 
 internals.startTimer = (timer, { payload }) => {
 	return timer.merge({
+		id: ShortId.generate(),
 		startedAt: Date.now(),
 		stoppedAt: null,
 		length: payload.length
@@ -26,6 +28,7 @@ internals.handleActions = handleActions({
 exports.reduce = (timer, action) => {
 	if (!timer) {
 		timer = Immutable.Map({
+			id: ShortId.generate(),
 			startedAt: null,
 			stoppedAt: null,
 			length: null
