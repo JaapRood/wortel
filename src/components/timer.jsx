@@ -12,11 +12,13 @@ internals.component = (props) => {
 	const {
 		startedAt,
 		pausedAt,
+		finishedAt,
 		length
 	} = props
 
-	const isRunning = startedAt && !pausedAt
-	const hasFinished = startedAt && pausedAt
+	const isRunning = startedAt && !pausedAt && !finishedAt
+	const isPaused = startedAt && pausedAt
+	const hasFinished = startedAt && finishedAt
 
 	const onClickStart = (e) => {
 		e.preventDefault()
@@ -27,12 +29,18 @@ internals.component = (props) => {
 	const onClickPause = (e) => {
 		e.preventDefault()
 
-		props.onStop()
+		props.onPause()
+	}
+
+	const onClickResume = (e) => {
+		e.preventDefault()
+
+		props.onResume()
 	}
 
 	return (
 		<div>
-			{ isRunning  && (
+			{ isRunning && (
 				<div>
 					Running for {Math.round(length / 1000)} seconds, Started at: {startedAt}
 
@@ -40,15 +48,23 @@ internals.component = (props) => {
 				</div>
 			)}
 
-			{ hasFinished && (
+			{ isPaused && (
 				<div>
-					Ran for { (stoppedAt - startedAt)  / 1000 } seconds, Stopped at: {stoppedAt}
+					Paused with {Math.round((pausedAt - startedAt) / 1000)}, paused at: {pausedAt}
 				</div>
 			)}
 
-			{ !isRunning || hasFinished ? (
+			{ hasFinished && (
+				<div>
+					Ran for { (finishedAt - startedAt)  / 1000 } seconds, Finished at: {finishedAt}
+				</div>
+			)}
+
+			{ (!isRunning && !isPaused) || hasFinished ? (
 				<button onClick={onClickStart}>Start</button>
-			) : (
+			) : isPaused ? (
+				<button onClick={onClickResume}>Resume</button>
+			):(
 				<button onClick={onClickPause}>Pause</button>
 			)}
 		</div>
@@ -63,13 +79,15 @@ internals.getPropsFromState = (state) => {
 	return {
 		startedAt: timer.get('startedAt'),
 		pausedAt: timer.get('pausedAt'),
+		finishedAt: timer.get('finishedAt'),
 		length: timer.get('length')
 	}
 }
 
 internals.actionProps = {
 	onStart: TimerActions.start,
-	onPause: TimerActions.pause
+	onPause: TimerActions.pause,
+	onResume: TimerActions.resume
 }
 
 module.exports = connect(internals.getPropsFromState, internals.actionProps)(internals.component)
