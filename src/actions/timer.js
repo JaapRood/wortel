@@ -17,6 +17,20 @@ internals.resetTimer = () => {
 	}
 }
 
+internals.startTimer = () => (dispatch, getState) => {
+	const timer = TimerReducer.getFromState(getState())
+
+	const timeoutLength = timer.get('length') - (Date.now() - timer.get('startedAt'))
+	internals.timerId = timer.get('id')
+	internals.timer = setTimeout(() => {
+		const currentTimerId = TimerReducer.getFromState(getState()).get('id')
+
+		if (internals.timerId !== currentTimerId) return; // ignore, this timer no longer exists
+
+		dispatch(exports.finish())
+	}, timeoutLength)
+}
+
 exports.start = () => (dispatch, getState) => {
 	const length = T(5).seconds().valueOf()
 
@@ -24,20 +38,23 @@ exports.start = () => (dispatch, getState) => {
 
 	dispatch(CreateAction(TimerReducer.START, { length: length }))
 
-	const createdTimer = TimerReducer.getFromState(getState())
-
-	internals.timerId = createdTimer.get('id')
-	internals.timer = setTimeout(() => {
-		const currentTimerId = TimerReducer.getFromState(getState()).get('id')
-
-		if (internals.timerId !== currentTimerId) return; // ignore, this timer no longer exists
-
-		dispatch(exports.stop())
-	}, length - (Date.now() - createdTimer.get('startedAt')))
+	dispatch(internals.startTimer())
 }
 
 exports.pause = () => (dispatch, getState) => {
 	internals.resetTimer()
 
-	dispatch(CreateAction(TimerReducer.STOP, { time: Date.now() }))
+	dispatch(CreateAction(TimerReducer.PAUSE, { time: Date.now() }))
+}
+
+exports.resume = () => (dispatch, getState) => {
+	dispatch(CreateAction(TimerReducer.RESUME, { length: length }))
+	
+	dispatch(internals.startTimer())
+}
+
+exports.finish = () => (dispatch, getState) => {
+	internals.resetTimer()
+
+	dispatch(CreateAction(TimerReducer.FINISH, { time: Date.now() }))
 }
