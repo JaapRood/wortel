@@ -4,6 +4,7 @@ const { connect } = require('react-redux');
 const TimerActions = require('app/actions/timer')
 const TimerReducer = require('app/reducers/timer')
 
+const CurrentTime = require('./timer/current-time')
 
 const internals = {};
 
@@ -32,7 +33,11 @@ internals.component = (props) => {
 	return (
 		<div>
 			{ isRunning  && (
-				<div>Running for {Math.round(length / 1000)} seconds, Started at: {startedAt}</div>
+				<div>
+					Running for {Math.round(length / 1000)} seconds, Started at: {startedAt}
+
+					<CurrentTime startedAt={startedAt} />
+				</div>
 			)}
 
 			{ hasFinished && (
