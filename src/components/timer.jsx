@@ -11,12 +11,12 @@ const internals = {};
 internals.component = (props) => {
 	const {
 		startedAt,
-		stoppedAt,
+		pausedAt,
 		length
 	} = props
 
-	const isRunning = startedAt && !stoppedAt
-	const hasFinished = startedAt && stoppedAt
+	const isRunning = startedAt && !pausedAt
+	const hasFinished = startedAt && pausedAt
 
 	const onClickStart = (e) => {
 		e.preventDefault()
@@ -24,7 +24,7 @@ internals.component = (props) => {
 		props.onStart()
 	}
 
-	const onClickStop = (e) => {
+	const onClickPause = (e) => {
 		e.preventDefault()
 
 		props.onStop()
@@ -49,7 +49,7 @@ internals.component = (props) => {
 			{ !isRunning || hasFinished ? (
 				<button onClick={onClickStart}>Start</button>
 			) : (
-				<button onClick={onClickStop}>Stop</button>
+				<button onClick={onClickPause}>Pause</button>
 			)}
 		</div>
 	)
@@ -62,14 +62,14 @@ internals.getPropsFromState = (state) => {
 
 	return {
 		startedAt: timer.get('startedAt'),
-		stoppedAt: timer.get('stoppedAt'),
+		pausedAt: timer.get('pausedAt'),
 		length: timer.get('length')
 	}
 }
 
 internals.actionProps = {
 	onStart: TimerActions.start,
-	onStop: TimerActions.stop
+	onPause: TimerActions.pause
 }
 
 module.exports = connect(internals.getPropsFromState, internals.actionProps)(internals.component)

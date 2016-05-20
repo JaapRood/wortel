@@ -36,7 +36,7 @@ exports.start = () => (dispatch, getState) => {
 	}, length - (Date.now() - createdTimer.get('startedAt')))
 }
 
-exports.stop = () => (dispatch, getState) => {
+exports.pause = () => (dispatch, getState) => {
 	internals.resetTimer()
 
 	dispatch(CreateAction(TimerReducer.STOP, { time: Date.now() }))

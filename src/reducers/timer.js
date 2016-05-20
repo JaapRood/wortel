@@ -3,7 +3,8 @@ const Immutable = require('immutable')
 const ShortId = require('shortid')
 
 exports.START = 'TIMER_START'
-exports.STOP = 'TIMER_STOP'
+// exports.STOP = 'TIMER_STOP'
+exports.PAUSE = 'TIMER_PAUSE'
 
 const internals = {}
 
@@ -11,18 +12,18 @@ internals.startTimer = (timer, { payload }) => {
 	return timer.merge({
 		id: ShortId.generate(),
 		startedAt: Date.now(),
-		stoppedAt: null,
+		pausedAt: null,
 		length: payload.length
 	})
 }
 
-internals.stopTimer = (timer, { payload }) => {
-	return timer.set('stoppedAt', payload.time)
+internals.pauseTimer = (timer, { payload }) => {
+	return timer.set('pausedAt', payload.time)
 }
 
 internals.handleActions = handleActions({
 	[exports.START]: internals.startTimer,
-	[exports.STOP]: internals.stopTimer
+	[exports.PAUSE]: internals.pauseTimer
 })
 
 exports.reduce = (timer, action) => {
@@ -30,7 +31,7 @@ exports.reduce = (timer, action) => {
 		timer = Immutable.Map({
 			id: ShortId.generate(),
 			startedAt: null,
-			stoppedAt: null,
+			pausedAt: null,
 			length: null
 		})
 	}
