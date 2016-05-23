@@ -1,7 +1,7 @@
 const React = require('react');
 const { Provider } = require('react-redux')
 
-const Timer = require('./timer')
+const Sprint = require('./sprint')
 
 const Styles = require('app/styles/components/app.less');
 
@@ -11,7 +11,7 @@ const App = ({ store }) => {
 			<div className={Styles.container}>
 				<h2>Wortel</h2>
 
-				<Timer />
+				<Sprint />
 			</div>
 		</Provider>
 	)

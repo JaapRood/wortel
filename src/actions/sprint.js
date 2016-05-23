@@ -1,7 +1,8 @@
 const CreateAction = require('app/lib/create-action')
 const T = require('time-sugar')
 
-const TimerReducer = require('app/reducers/timer')
+const Sprint = require('app/models/sprint')
+const SprintReducer = require('app/reducers/sprint')
 
 const internals = {}
 
@@ -18,25 +19,28 @@ internals.resetTimer = () => {
 }
 
 internals.startTimer = () => (dispatch, getState) => {
-	const timer = TimerReducer.getFromState(getState())
+	const sprint = SprintReducer.getFromState(getState())
+	
+	const remainingLength = Sprint.getRemainingLengthAt(sprint, new Date())
 
-	const timeoutLength = timer.get('length') - (Date.now() - timer.get('startedAt'))
-	internals.timerId = timer.get('id')
+	internals.timerId = Sprint.getCurrentRun(sprint).get('id')
 	internals.timer = setTimeout(() => {
-		const currentTimerId = TimerReducer.getFromState(getState()).get('id')
+		const currentSprint = SprintReducer.getFromState(getState())
+		const currentTimerId = Sprint.getCurrentRun(currentSprint).get('id')
 
 		if (internals.timerId !== currentTimerId) return; // ignore, this timer no longer exists
 
 		dispatch(exports.finish())
-	}, timeoutLength)
+	}, remainingLength)
 }
 
 exports.start = () => (dispatch, getState) => {
-	const length = T(5).seconds().valueOf()
-
 	internals.resetTimer()
 
-	dispatch(CreateAction(TimerReducer.START, { length: length }))
+	dispatch(CreateAction(SprintReducer.START, { 
+		time: new Date(),
+		length: T(15).seconds().valueOf()
+	}))
 
 	dispatch(internals.startTimer())
 }
@@ -44,11 +48,11 @@ exports.start = () => (dispatch, getState) => {
 exports.pause = () => (dispatch, getState) => {
 	internals.resetTimer()
 
-	dispatch(CreateAction(TimerReducer.PAUSE, { time: Date.now() }))
+	dispatch(CreateAction(SprintReducer.PAUSE, { time: new Date() }))
 }
 
 exports.resume = () => (dispatch, getState) => {
-	dispatch(CreateAction(TimerReducer.RESUME, { length: length }))
+	dispatch(CreateAction(SprintReducer.RESUME, { time: new Date(), length: length }))
 	
 	dispatch(internals.startTimer())
 }
@@ -56,5 +60,5 @@ exports.resume = () => (dispatch, getState) => {
 exports.finish = () => (dispatch, getState) => {
 	internals.resetTimer()
 
-	dispatch(CreateAction(TimerReducer.FINISH, { time: Date.now() }))
+	dispatch(CreateAction(SprintReducer.FINISH, { time: new Date() }))
 }
