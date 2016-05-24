@@ -33,7 +33,7 @@ Test('TimedRun.create', (t) => {
 	}, 'accepts a start date')
 })
 
-Test('TimedRun.hasStopped', (t) => {
+Test('TimedRun.stop', (t) => {
 	t.plan(3)
 
 	const startDate = new Date(T(15).minutes().beforeNow())
@@ -46,4 +46,20 @@ Test('TimedRun.hasStopped', (t) => {
 		t.ok(TimedRun.instanceOf(stoppedRun), 'returns an updated timed run instance')
 		t.equal(stoppedRun.get('stoppedAt'), stopDate.getTime(), 'returned instance has stoppedAt prop set to timestamp of date passed')
 	}, 'accepts a timed run instance and stop date')
+})
+
+Test('TimedRun.getLength', (t) => {
+	t.plan(3)
+
+	const startDate = new Date()
+	const stopDate = new Date(T(10).minutes().from(startDate))
+
+	const timedRun = TimedRun.stop(TimedRun.create(startDate), stopDate)
+
+	t.doesNotThrow(function() {
+		const length = TimedRun.getLength(timedRun)
+
+		t.ok(_.isNumber(length), 'returns a number')
+		t.equal(length, T(10).minutes().valueOf(), 'returns the difference between start and stop time')
+	}, 'accepts a stopped timed run instance')
 })
